@@ -6,18 +6,37 @@
     * update = PUT para atualizar um registro.
     * delete - DELETE para remover um registro.
 */
+const { hash } = require("bcryptjs");
 const AppError = require("../utils/AppError");
+
+const sqliteConnection = require("../database/sqlite");
 
 class UsersControllers {
     
-    create(request, response) {
-        const { name, email, password } = request.body;
+    async create(request, response) {
+        const { name, address, email, password, phone, cpf } = request.body;
 
-        if(!name){
-            throw new AppError("Nome é obrigatório!");
+        const database = await sqliteConnection();
+        const checkUserExist = await database.get(
+            "SELECT * FROM clients WHERE email = (?) OR cpf = (?)", [email, cpf]
+        )
+
+        if(checkUserExist) {
+            if (checkUserExist.email === email) {
+                throw new AppError("Este e-mail já está em uso.");
+            } else if (checkUserExist.cpf === cpf){
+                throw new AppError("Este CPF já está em uso.");
+            }
         }
 
-        response.status(201).json({ name, email, password });
+        const hashedPassword = await hash(password, 10);
+
+        await database.run(
+            "INSERT INTO clients (name, address, email, password, phone, cpf) VALUES (?, ?, ?, ?, ?, ?)",
+             [name, address, email, hashedPassword, phone, cpf]
+        );
+
+        return response.status(201).json();
     }
 }
 
