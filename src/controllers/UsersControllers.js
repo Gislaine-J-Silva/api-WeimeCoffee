@@ -6,7 +6,7 @@
     * update = PUT para atualizar um registro.
     * delete - DELETE para remover um registro.
 */
-const { hash } = require("bcryptjs");
+const { hash, compare } = require("bcryptjs");
 const AppError = require("../utils/AppError");
 
 const sqliteConnection = require("../database/sqlite");
@@ -37,6 +37,62 @@ class UsersControllers {
         );
 
         return response.status(201).json();
+    }
+    
+    async update(request, response) {
+        const { name, email, new_password, current_password, address, phone } = request.body;
+        const { id } = request.params;
+        
+        const database = await sqliteConnection();
+        const user = await database.get(
+            "SELECT * FROM clients WHERE id = (?)", [id]
+        )
+        
+        if(!user) {
+            throw new AppError("Usuário não encontrado");
+        }
+        
+        const userEmailUpdate = await database.get(
+            "SELECT * FROM clients WHERE email = (?)", [email]
+        )
+        
+        if(userEmailUpdate && userEmailUpdate.id !== user.id){
+            throw new AppError("Esse e-mail já está em uso.");
+        }
+        
+        user.name = name;
+        user.address = address;
+        user.email = email;
+        user.phone = phone;
+
+        if(new_password && !current_password){
+            throw new AppError("Informe a senha atual")
+        }
+
+        if(new_password && current_password) {
+            const checkCurrentPassword = await compare(current_password, user.password);
+
+            if(!checkCurrentPassword){
+                throw new AppError("Senha atual não confere.")
+            }
+
+            user.password = await hash(new_password, 10);
+        }
+
+
+        await database.run(`
+            UPDATE clients SET
+            name = ?,
+            address = ?,
+            email = ?,
+            password = ?,
+            phone = ?,
+            updated_at = ?
+            WHERE id = ?`,
+            [user.name, user.address, user.email, user.password, user.phone, new Date(), id]
+        )
+
+        return response.status(200).json();
     }
 }
 
