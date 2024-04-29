@@ -60,10 +60,10 @@ class UsersControllers {
             throw new AppError("Esse e-mail já está em uso.");
         }
         
-        user.name = name;
-        user.address = address;
-        user.email = email;
-        user.phone = phone;
+        user.name = name ?? user.name;
+        user.address = address ?? user.address;
+        user.email = email ?? user.email;
+        user.phone = phone ?? user.phone;
 
         if(new_password && !current_password){
             throw new AppError("Informe a senha atual")
@@ -87,9 +87,9 @@ class UsersControllers {
             email = ?,
             password = ?,
             phone = ?,
-            updated_at = ?
+            updated_at = DATETIME('now')
             WHERE id = ?`,
-            [user.name, user.address, user.email, user.password, user.phone, new Date(), id]
+            [user.name, user.address, user.email, user.password, user.phone, id]
         )
 
         return response.status(200).json();
