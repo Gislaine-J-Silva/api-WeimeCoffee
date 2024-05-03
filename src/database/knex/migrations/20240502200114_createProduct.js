@@ -1,9 +1,9 @@
 
 exports.up = knex => knex.schema.createTable("products", table => {
     table.increments("id");
-    table.string("name", 20);
+    table.string("name", 100);
     table.text("description");
-    table.decimal("price");
+    table.decimal("price", 10, 2);
     table.text("category");
     table.text("brand");
     table.integer("stock_quantity");
