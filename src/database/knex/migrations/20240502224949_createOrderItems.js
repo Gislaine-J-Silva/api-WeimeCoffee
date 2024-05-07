@@ -1,9 +1,14 @@
 exports.up = knex => knex.schema.createTable("order_items", table => {
     table.increments("id");
-    table.interger("order_id").unsigned().references("id").inTable("clients");
+    table.integer("order_id").unsigned().references("id").inTable("orders");
     table.string("product_description");
     table.string("color");
-    table.interger("")
+    table.integer("size");
+    table.integer("quantity").notNullable();
+    table.decimal("unit_price", 10, 2).notNullable();
+    table.decimal("total_value", 10, 2).notNullable();
+    table.decimal("discount", 10, 2);
+    table.json("return_exchange_info");
 });
 
 
