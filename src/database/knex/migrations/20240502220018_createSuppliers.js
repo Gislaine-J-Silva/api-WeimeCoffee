@@ -5,6 +5,7 @@ exports.up = knex => knex.schema.createTable("suppliers", table => {
     table.text("address");
     table.text("email");
     table.string("phone");
+    table.text("cnpj").unique();
     table.text("supplier_type");
     table.json("transaction_history");
     table.text("payment_terms");
