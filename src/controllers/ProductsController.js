@@ -64,6 +64,7 @@ class ProductsController {
 
         return response.json();
     }
+
 }
 
 module.exports = ProductsController;

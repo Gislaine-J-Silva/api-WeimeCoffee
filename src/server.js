@@ -4,13 +4,26 @@ const migrationsRun = require("./database/sqlite/migrations");
 const AppError = require("./utils/AppError");
 
 const express = require("express");
+const AccessLogController = require("./controllers/AccessLogController");
+
 
 const routes = require("./routes");
 
 migrationsRun();
 
+const accessLogController = new AccessLogController();
+
 const app = express();
 app.use(express.json());
+
+app.use(async (request, response, next) => {
+    const { user_id, ip, action, device, browser, product, details } = request.body;
+
+    await accessLogController.addAccessLog(user_id, ip, action, device, browser, product, details);
+
+    next();
+});
+
 
 app.use(routes);
 
