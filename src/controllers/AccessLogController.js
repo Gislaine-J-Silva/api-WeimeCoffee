@@ -1,3 +1,4 @@
+const { json } = require("express");
 const knex = require("../database/knex");
 
 class AccessLogController{
@@ -11,8 +12,6 @@ class AccessLogController{
             visited_product: product,
             details
         });
-
-        return console.log("Registro de acesso adicionado com sucesso.")
     }
 }
 
