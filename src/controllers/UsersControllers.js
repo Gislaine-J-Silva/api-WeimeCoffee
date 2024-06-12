@@ -41,11 +41,11 @@ class UsersControllers {
     
     async update(request, response) {
         const { name, email, new_password, current_password, address, phone } = request.body;
-        const { id } = request.params;
+        const user_id = request.user.id;
         
         const database = await sqliteConnection();
         const user = await database.get(
-            "SELECT * FROM clients WHERE id = (?)", [id]
+            "SELECT * FROM clients WHERE id = (?)", [user_id]
         )
         
         if(!user) {
@@ -89,7 +89,7 @@ class UsersControllers {
             phone = ?,
             updated_at = DATETIME('now')
             WHERE id = ?`,
-            [user.name, user.address, user.email, user.password, user.phone, id]
+            [user.name, user.address, user.email, user.password, user.phone, user_id]
         )
 
         return response.status(200).json();
