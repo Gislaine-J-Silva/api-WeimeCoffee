@@ -9,7 +9,7 @@ const routes = require("./routes");
 const cors = require("cors");
 const AccessLogController = require("./controllers/AccessLogController");
 
-
+const { addToCart, getCartItems } = require("./middlewares/cartMiddleware");
 
 migrationsRun();
 
@@ -39,6 +39,11 @@ app.use(( error, request, response, next ) => {
         message: "Internal server error"
     })
 });
+
+app.post('/cart', addToCart);
+app.get('/cart', getCartItems);
+
+app.use('/products', require('./routes/productsRoutes'));
 
 app.use(async (request, response, next) => {
     const { user_id, ip, action, device, browser, product, details } = request.body;

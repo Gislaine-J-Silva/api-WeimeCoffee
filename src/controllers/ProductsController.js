@@ -65,6 +65,16 @@ class ProductsController {
         return response.json();
     }
 
+    async index(request, response) {
+        try {
+            const products = await knex("products").select("*");
+            return response.json(products);
+        } catch (error) {
+            console.error('Erro ao buscar produtos', error);
+            return response.status(500).json({ message: 'Erro ao buscar produtos' });
+        }
+    }
+
 }
 
 module.exports = ProductsController;
